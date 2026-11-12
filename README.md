@@ -58,28 +58,40 @@ On this topology the project:
 ```
 .
 ├── README.md
-├── models/
-│   ├── open_loop/
-│   │   └── v2v_open_loop.slx            # EV1 battery as source, EV2 as equivalent resistance (and reverse)
-│   ├── closed_loop/
-│   │   ├── v2v_closed_loop_pi.slx       # PI current controller
-│   │   ├── v2v_closed_loop_ismc.slx     # Integral sliding-mode controller
-│   │   ├── v2v_closed_loop_fuzzy.slx    # Fuzzy logic controller
-│   │   └── ev_v2v.fis                   # Mamdani FIS used by the fuzzy controller
-│   ├── losses/
-│   │   ├── v2v_loss_model.slx           # Conduction + switching loss subsystem per switch
-│   │   └── avg_loss.m                   # Average-loss post-processing script
-│   └── opal_rt/
-│       └── v2v_opalrt.slx               # Model partitioned into SM_ / SC_ subsystems for RT-LAB
-├── scripts/
-│   ├── triangle_carrier.m               # Carrier generator used in the MATLAB Function block
-│   └── compare_plots.m                  # Overlay plots of PI / ISMC / FLC from workspace data
+├── closed_loop/
+│   ├── closeloop_fyp.slx                     # Closed-loop V2V model (PI current control)
+│   ├── closeloop_fyp_finalllllll_2025a.slx   # Final closed-loop model, saved in MATLAB R2025a
+│   ├── fuzzy_cntrler.slx                     # Closed-loop model with the fuzzy logic controller
+│   ├── ismc_ctrller (1).slx                  # Closed-loop model with the integral sliding-mode controller
+│   └── ev_fuzz.fis                           # Mamdani fuzzy inference system used by the FLC
+├── open_loop/
+│   └── openloop_ev2toev1_2025a.slxc          # Open-loop model, EV2 → EV1 (Mode 2)
+├── losses/
+│   ├── pi_rotation_loss.slx                  # Semiconductor-loss model (conduction + switching per switch)
+│   ├── pi_normal_loss.slxc                   # Loss model, PI controller
+│   └── ACS37002-Datasheet.pdf                # Datasheet referenced by the loss model
+├── scripts and files/
+│   ├── build_triangle_gen.m                  # Triangular carrier generator for PWM
+│   ├── lookup_vce.m                          # V_CE,sat / switching-energy look-up tables for the loss model
+│   ├── loss_cal.m                            # Average conduction / switching loss over the logged interval
+│   ├── loss_comparison.m                     # Loss comparison between controllers
+│   ├── comparison_ss_tr.m                    # Steady-state and transient comparison plots (PI / ISMC / FLC)
+│   └── plot_3dim.m                           # 3-D voltage-gain plots (duty ratio vs frequency ratio)
+├── documents/
+│   ├── final_report_fyp.docx                 # Full project report
+│   ├── fyp conference.docx / .pdf            # Conference paper
+│   ├── fyp_journal.docx                      # Journal manuscript
+│   ├── Final Review FYP.pptx                 # Final review presentation
+│   ├── Fyp_poster.docx                       # Project poster
+│   ├── FYP.xlsx                              # Simulation data / calculations
+│   └── drawing.pdf                           # Converter drawing
 └── github_repo/
     └── docs/
-        └── images/                      # Figures used in this README
+        └── images/                           # Figures used in this README
 ```
 
 ---
+
 
 ## Requirements
 
