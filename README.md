@@ -1,10 +1,10 @@
-# Isolated-Single-Stage-Bidirectional-V2V-EV-Charging-Converter
-Design, simulation and real-time (software-in-the-loop) validation of an isolated, single-stage, bidirectional **vehicle-to-vehicle (V2V)** charging converter, with a comparison of three charging-current controllers
+# Isolated Single-Stage Bidirectional V2V EV Charging Converter
+
+Design, simulation and real-time (software-in-the-loop) validation of an isolated, single-stage, bidirectional **vehicle-to-vehicle (V2V)** charging converter, with a comparison of three charging-current controllers:
+
 - **PI** – proportional–integral control
 - **ISMC** – integral sliding-mode control
 - **FLC** – Mamdani fuzzy logic control
-
-> **Status:** simulation and OPAL-RT software-in-the-loop (SIL) study. No hardware prototype has been built yet; see [Limitations](#limitations).
 
 ---
 
@@ -55,8 +55,6 @@ On this topology the project:
 
 ## Repository structure
 
-> The model files are added separately. Rename the entries below to match your actual file names.
-
 ```
 .
 ├── README.md
@@ -76,8 +74,9 @@ On this topology the project:
 ├── scripts/
 │   ├── triangle_carrier.m               # Carrier generator used in the MATLAB Function block
 │   └── compare_plots.m                  # Overlay plots of PI / ISMC / FLC from workspace data
-└── docs/
-    └── images/                          # Figures used in this README
+└── github_repo/
+    └── docs/
+        └── images/                      # Figures used in this README
 ```
 
 ---
@@ -90,8 +89,6 @@ On this topology the project:
 | Simscape Electrical (Specialized Power Systems) | Power stage, batteries, switches |
 | Fuzzy Logic Toolbox | `ev_v2v.fis` and the fuzzy controller block |
 | OPAL-RT **RT-LAB** + OP4610XG target | Real-time SIL execution (optional) |
-
-> The OPAL-RT model was built in R2024a. Check that your RT-LAB release supports the MATLAB version you are using before compiling.
 
 ---
 
@@ -128,9 +125,10 @@ On this topology the project:
 
 ## Converter topology and operation
 
-![Converter topology](docs/images/converter_topology.png)
-
-*Isolated single-stage bidirectional V2V converter: reconfigured OBC bridge of EV1 (left), external resonant HFT connector (centre), reconfigured OBC bridge of EV2 (right). Topology after Zhou et al. (2026).*
+<p align="center">
+  <img src="github_repo/docs/images/converter_topology.png" width="900" alt="Isolated single-stage bidirectional V2V converter: OBC bridge of EV1 (left), external resonant HFT connector (centre), OBC bridge of EV2 (right). Topology after Zhou et al. (2026)"><br>
+  <em>Isolated single-stage bidirectional V2V converter: OBC bridge of EV1 (left), external resonant HFT connector (centre), OBC bridge of EV2 (right). Topology after Zhou et al. (2026)</em>
+</p>
 
 ### Components
 
@@ -278,7 +276,6 @@ Inference uses AND = min, OR = max, implication = min and aggregation = max, wit
 
 $$u^* = \frac{\int_0^1 u\,\mu_{agg}(u)\,du}{\int_0^1 \mu_{agg}(u)\,du}$$
 
-> ⚠️ **Check the `.fis` file.** In the original file, rule 10 was `1 5, 1 (1) : 1`. That duplicates the NB/PB cell (rule 5 gives Medium) and leaves NS/PB undefined. The table above assumes the intended rule `2 5, 1 (1) : 1`. Correct the file if it still has the typo.
 
 ---
 
@@ -286,11 +283,17 @@ $$u^* = \frac{\int_0^1 u\,\mu_{agg}(u)\,du}{\int_0^1 \mu_{agg}(u)\,du}$$
 
 ### 1. Open-loop: voltage gain and operating points
 
-![Voltage gain surface](docs/images/openloop_gain_surface.png)
+<p align="center">
+  <img src="github_repo/docs/images/openloop_gain_surface.png" width="720" alt="Voltage gain versus duty ratio and frequency ratio fS/fR"><br>
+  <em>Voltage gain versus duty ratio and frequency ratio fS/fR</em>
+</p>
 
 The gain is highest at $f_S/f_R = 1$ and falls as the switching frequency moves away from resonance. At a given frequency ratio, a larger $D$ raises the gain.
 
-![Duty-ratio sweep](docs/images/openloop_duty_sweep.png)
+<p align="center">
+  <img src="github_repo/docs/images/openloop_duty_sweep.png" width="720" alt="Receiving-battery voltage versus duty ratio: Mode 1 (left) and Mode 2 (right)"><br>
+  <em>Receiving-battery voltage versus duty ratio: Mode 1 (left) and Mode 2 (right)</em>
+</p>
 
 | Mode | Target voltage | Simulated $D$ | Ideal voltage from gain equation | Deviation |
 |---|---|---|---|---|
@@ -303,9 +306,20 @@ The simulated operating points are within 4 % of the idealized gain. The differe
 
 **Mode 1 (EV1 → EV2), rated operating point**
 
-| Source side | Receiving side | Power |
-|---|---|---|
-| ![](docs/images/openloop_mode1_source_side.png) | ![](docs/images/openloop_mode1_receiving_side.png) | ![](docs/images/openloop_mode1_power.png) |
+<p align="center">
+  <img src="github_repo/docs/images/openloop_mode1_source_side.png" width="720" alt="Mode 1 – source side: battery voltage and current, DC-link voltage, primary bridge voltage, primary current"><br>
+  <em>Mode 1 – source side: battery voltage and current, DC-link voltage, primary bridge voltage, primary current</em>
+</p>
+
+<p align="center">
+  <img src="github_repo/docs/images/openloop_mode1_receiving_side.png" width="720" alt="Mode 1 – receiving side: secondary voltage, DC-link voltage, load voltage and current"><br>
+  <em>Mode 1 – receiving side: secondary voltage, DC-link voltage, load voltage and current</em>
+</p>
+
+<p align="center">
+  <img src="github_repo/docs/images/openloop_mode1_power.png" width="720" alt="Mode 1 – input and output power"><br>
+  <em>Mode 1 – input and output power</em>
+</p>
 
 | Quantity (Mode 1) | Value (read from waveforms) |
 |---|---|
@@ -318,9 +332,15 @@ The simulated operating points are within 4 % of the idealized gain. The differe
 
 **Mode 2 (EV2 → EV1)**
 
-| Source side | Power |
-|---|---|
-| ![](docs/images/openloop_mode2_source_side.png) | ![](docs/images/openloop_mode2_power.png) |
+<p align="center">
+  <img src="github_repo/docs/images/openloop_mode2_source_side.png" width="720" alt="Mode 2 – source side: battery voltage and current, DC-link voltage, primary voltage and current"><br>
+  <em>Mode 2 – source side: battery voltage and current, DC-link voltage, primary voltage and current</em>
+</p>
+
+<p align="center">
+  <img src="github_repo/docs/images/openloop_mode2_power.png" width="720" alt="Mode 2 – input and output power"><br>
+  <em>Mode 2 – input and output power</em>
+</p>
 
 | Quantity (Mode 2) | Value (read from waveforms) |
 |---|---|
@@ -333,9 +353,15 @@ The simulated operating points are within 4 % of the idealized gain. The differe
 
 Reference: 10 → 50 A in 10 A steps every 3 s. Each value is the mean regulated current between 0.6 s and 2.8 s after a step.
 
-| Mode 1 – EV1 current I<sub>B1</sub> | Mode 1 – EV2 current I<sub>B2</sub> (negative = charging) |
-|---|---|
-| ![](docs/images/steadystate_IB1_comparison.png) | ![](docs/images/steadystate_IB2_comparison.png) |
+<p align="center">
+  <img src="github_repo/docs/images/steadystate_IB1_comparison.png" width="720" alt="Mode 1 – EV1 battery current with PI, ISMC and FLC"><br>
+  <em>Mode 1 – EV1 battery current with PI, ISMC and FLC</em>
+</p>
+
+<p align="center">
+  <img src="github_repo/docs/images/steadystate_IB2_comparison.png" width="720" alt="Mode 1 – EV2 battery current with PI, ISMC and FLC (negative = charging)"><br>
+  <em>Mode 1 – EV2 battery current with PI, ISMC and FLC (negative = charging)</em>
+</p>
 
 | Reference (A) | 10 | 20 | 30 | 40 | 50 | Resolution |
 |---|---|---|---|---|---|---|
@@ -349,15 +375,29 @@ Reference: 10 → 50 A in 10 A steps every 3 s. Each value is the mean regulated
 \* Converges slowly within this step, from about 17 A to 22 A.
 Peak-to-peak ripple of the regulated current is about 9–11 A for all three controllers.
 
-> In the overlay plots the FLC trace (blue) is hidden under the PI trace, because in Mode 1 they settle at the same levels.
+In the overlay plots the FLC trace (blue) is hidden under the PI trace, because in Mode 1 they settle at the same levels.
 
 ### 4. Start-up transient (Mode 1, first 0.1 s)
 
-| EV1 current | EV2 current |
-|---|---|
-| ![](docs/images/transient_IB1.png) | ![](docs/images/transient_IB2.png) |
-| **EV1 voltage** | **EV2 voltage** |
-| ![](docs/images/transient_VB1.png) | ![](docs/images/transient_VB2.png) |
+<p align="center">
+  <img src="github_repo/docs/images/transient_IB1.png" width="720" alt="Start-up transient – EV1 current"><br>
+  <em>Start-up transient – EV1 current</em>
+</p>
+
+<p align="center">
+  <img src="github_repo/docs/images/transient_IB2.png" width="720" alt="Start-up transient – EV2 current"><br>
+  <em>Start-up transient – EV2 current</em>
+</p>
+
+<p align="center">
+  <img src="github_repo/docs/images/transient_VB1.png" width="720" alt="Start-up transient – EV1 voltage"><br>
+  <em>Start-up transient – EV1 voltage</em>
+</p>
+
+<p align="center">
+  <img src="github_repo/docs/images/transient_VB2.png" width="720" alt="Start-up transient – EV2 voltage"><br>
+  <em>Start-up transient – EV2 voltage</em>
+</p>
 
 | Controller | Peak \|I<sub>B1</sub>\| (A) | Peak \|I<sub>B2</sub>\| (A) | Max ΔV<sub>B2</sub> (V) | t<sub>s</sub> V<sub>B1</sub> (ms) | t<sub>s</sub> V<sub>B2</sub> (ms) | t<sub>s</sub> I<sub>B2</sub> (ms) |
 |---|---|---|---|---|---|---|
@@ -369,7 +409,10 @@ $t_s$ is the settling time to ±2 % of the final value for voltages and to ±20 
 
 ### 5. Efficiency
 
-![Efficiency vs SOC](docs/images/efficiency_vs_soc.png)
+<p align="center">
+  <img src="github_repo/docs/images/efficiency_vs_soc.png" width="900" alt="Efficiency versus source-battery SOC for PI, ISMC and FLC: Mode 1 (left) and Mode 2 (right)"><br>
+  <em>Efficiency versus source-battery SOC for PI, ISMC and FLC: Mode 1 (left) and Mode 2 (right)</em>
+</p>
 
 The receiving battery is held at 25 % SOC while the source-battery SOC is swept.
 
@@ -386,11 +429,14 @@ $\eta = P_{out}/P_{in} \times 100\%$
 
 ### 6. Semiconductor losses (ISMC, Mode 2)
 
-Conduction loss uses the datasheet $V_{CE,sat}(I_C)$ curve, and switching loss uses the datasheet $E_{on}$/$E_{off}$ energies at each detected gate transition:
+Conduction loss uses the datasheet $V_{CE,sat}(I_C)$ curve, and switching loss uses the datasheet $E_{on}$/$E_{off}$ energies at each detected gate transition. The average over the logged interval is computed with `avg_loss.m`:
 
 $$P_{cond} = V_{CE,sat}(I_C)\, I_C, \qquad P_{sw} = \frac{\sum E_{on} + \sum E_{off}}{t_{end} - t_{start}}$$
 
-![Loss per switch](docs/images/semiconductor_losses_per_switch.png)
+<p align="center">
+  <img src="github_repo/docs/images/semiconductor_losses_per_switch.png" width="600" alt="Conduction and switching loss of each switch (ISMC, Mode 2)"><br>
+  <em>Conduction and switching loss of each switch (ISMC, Mode 2)</em>
+</p>
 
 | Side | Conduction (W) | Switching (W) | Total (W) |
 |---|---|---|---|
@@ -402,15 +448,28 @@ $$P_{cond} = V_{CE,sat}(I_C)\, I_C, \qquad P_{sw} = \frac{\sum E_{on} + \sum E_{
 - The always-on switches (EV1-S7, EV2-S7) have conduction loss only.
 - Inactive switches show zero loss.
 
-> ⚠️ The report text gives the averaging window as 0.2–1.5 s, but `avg_loss.m` uses `t >= 0.2 & t <= 10`. Make the two match. The window falls in the first (10 A) reference step, so do **not** quote these losses as a percentage of the 24 kW rating.
 
 ### 7. OPAL-RT software-in-the-loop
 
-| Setup | PI – Mode 1 |
-|---|---|
-| ![](docs/images/opalrt_setup.png) | ![](docs/images/opalrt_pi_mode1.png) |
-| **ISMC – Mode 1** | **FLC – Mode 1** |
-| ![](docs/images/opalrt_ismc_mode1.png) | ![](docs/images/opalrt_flc_mode1.png) |
+<p align="center">
+  <img src="github_repo/docs/images/opalrt_setup.png" width="600" alt="OPAL-RT OP4610XG with analog interface and oscilloscope"><br>
+  <em>OPAL-RT OP4610XG with analog interface and oscilloscope</em>
+</p>
+
+<p align="center">
+  <img src="github_repo/docs/images/opalrt_pi_mode1.png" width="600" alt="OPAL-RT SIL capture – PI, Mode 1 (EV1 voltage, current, power, SOC)"><br>
+  <em>OPAL-RT SIL capture – PI, Mode 1 (EV1 voltage, current, power, SOC)</em>
+</p>
+
+<p align="center">
+  <img src="github_repo/docs/images/opalrt_ismc_mode1.png" width="600" alt="OPAL-RT SIL capture – ISMC, Mode 1"><br>
+  <em>OPAL-RT SIL capture – ISMC, Mode 1</em>
+</p>
+
+<p align="center">
+  <img src="github_repo/docs/images/opalrt_flc_mode1.png" width="600" alt="OPAL-RT SIL capture – FLC, Mode 1"><br>
+  <em>OPAL-RT SIL capture – FLC, Mode 1</em>
+</p>
 
 The model runs in real time on the OP4610XG with a 5 µs step. Oscilloscope captures of battery voltage, current, power and SOC show the stepwise response and a monotonic SOC change for all three controllers in both modes, matching the offline results. These are **SIL** results: the converter is simulated, not hardware.
 
@@ -493,3 +552,5 @@ N. Subramanian, Sahas Vishanth M. V., Tanukasree R., and G. Kanimozhi,
 "Isolated Single-Stage Bidirectional V2V EV Charging Converter: PI, ISMC and Fuzzy Current Control,"
 GitHub repository, 2026.
 ```
+
+**License:** add a `LICENSE` file (for example MIT) before making the repository public.
